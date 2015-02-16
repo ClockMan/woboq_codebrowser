@@ -32,6 +32,7 @@
 #include <clang/AST/DeclTemplate.h>
 #include <clang/AST/PrettyPrinter.h>
 #include <clang/AST/ASTContext.h>
+#include <clang/AST/RecordLayout.h>
 #include <clang/Lex/Lexer.h>
 #include <clang/Lex/Preprocessor.h>
 #include <clang/Sema/Sema.h>
@@ -93,10 +94,17 @@ ssize_t getDeclSize(const clang::Decl* decl)
 ssize_t getFieldOffset(const clang::Decl* decl)
 {
     const clang::FieldDecl* fd = llvm::dyn_cast<clang::FieldDecl>(decl);
-    if (fd) {
-        return decl->getASTContext().getFieldOffset(fd);
+    if (!fd || fd->isInvalidDecl()) {
+        return -1;
     }
-    return -1;
+
+    const clang::RecordDecl* parent = fd->getParent();
+    if (!parent || parent->isInvalidDecl()) {
+        return -1;
+    }
+
+    const clang::ASTRecordLayout &layout = decl->getASTContext().getASTRecordLayout(parent);
+    return layout.getFieldOffset(fd->getFieldIndex());
 }
 
 };
