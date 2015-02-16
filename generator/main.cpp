@@ -55,9 +55,9 @@ cl::list<std::string> SourcePaths(
   cl::ZeroOrMore);
 
 cl::opt<std::string> OutputPath(
-    "o",
+    "O",
     cl::desc("<output path>"),
-    cl::Required);
+    cl::Required); /** llvm/clang-3.7 defaults have 'o' */
 
 
 cl::list<std::string> ProjectPaths(
@@ -72,9 +72,9 @@ cl::list<std::string> ExternalProjectPaths(
     cl::ZeroOrMore);
 
 cl::opt<std::string> DataPath(
-    "d",
+    "D",
     cl::desc("<data path>"),
-    cl::Optional);
+    cl::Optional); /** llvm/clang-3.7 defaults have 'd' */
 
 cl::opt<bool> ProcessAllSources(
     "a",
