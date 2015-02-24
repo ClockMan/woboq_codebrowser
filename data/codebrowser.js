@@ -633,7 +633,7 @@ $(function () {
                         return;
                     }
                     var offset = $(this).html();
-                    content += "<br/>Offset: " + escape_html(offset >> 3) + " bytes (" + offset + ")";
+                    content += "<br/>Offset: " + escape_html(parseInt(offset, 10) >> 3) + " bytes (" + offset + ")";
                 });
             }
 
