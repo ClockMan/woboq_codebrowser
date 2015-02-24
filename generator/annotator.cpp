@@ -364,6 +364,7 @@ bool Annotator::generate(clang::Sema &Sema, bool WasInDatabase)
                 case Inherit:
                     tag = "inh";
             }
+            myfile << "<" << tag << " ";
             addFilePathAndLoc(myfile, loc);
             if (loc.isMacroID()) myfile << " macro='1'";
             if (!WasInDatabase) myfile << " brk='1'";
@@ -378,13 +379,26 @@ bool Annotator::generate(clang::Sema &Sema, bool WasInDatabase)
         }
 
         auto itS = structure_sizes.find(it.first);
-        if (itS != structure_sizes.end() && itS->second != -1) {
-            myfile << "<size>"<< itS->second <<"</size>\n";
+        if (itS != structure_sizes.end()) {
+            ssize_t size = std::get<0>(itS->second);
+            clang::SourceLocation loc = std::get<1>(itS->second);
+            if (size != -1) {
+               myfile << "<size ";
+               addFilePathAndLoc(myfile, loc);
+               myfile << ">"<< size <<"</size>\n";
+            }
         }
         auto itF = field_offsets.find(it.first);
-        if (itF != field_offsets.end() && itF->second != -1) {
-            myfile << "<offset>"<< itF->second <<"</offset>\n";
+        if (itF != field_offsets.end()) {
+            ssize_t offset = std::get<0>(itF->second);
+            clang::SourceLocation loc = std::get<1>(itF->second);
+            if (offset != -1) {
+               myfile << "<offset ";
+               addFilePathAndLoc(myfile, loc);
+               myfile << ">"<< offset <<"</size>\n";
+            }
         }
+
         auto range =  commentHandler.docs.equal_range(it.first);
         for (auto it2 = range.first; it2 != range.second; ++it2) {
             myfile << "<doc ";
@@ -687,13 +701,13 @@ void Annotator::addReference(const std::string &ref, clang::SourceLocation refLo
         || ((type == Type || type == Enum) && dt == Definition)) {
         ssize_t size = getDeclSize(decl);
         if (size >= 0) {
-            structure_sizes[ref] = size;
+            structure_sizes[ref] = std::make_tuple(size, refLoc);
         }
         references[ref].push_back( std::make_tuple(dt, refLoc, typeRef) );
         if (dt < Use) {
             ssize_t offset = getFieldOffset(decl);
             if (offset >= 0) {
-                field_offsets[ref] = offset;
+                field_offsets[ref] = std::make_tuple(offset, refLoc);
             }
             clang::FullSourceLoc fulloc(decl->getLocStart(), getSourceMgr());
             commentHandler.decl_offsets.insert({ fulloc.getSpellingLoc(), {ref, true} });
