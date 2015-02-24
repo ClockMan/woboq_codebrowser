@@ -288,7 +288,7 @@ void CommentHandler::handleComment(Annotator &A, Generator& generator, clang::Se
     auto it_after = dof.upper_bound(searchLocEnd);
     if (it_before != dof.end() && it_after != dof.begin() && it_before == (--it_after)) {
         if (it_before->second.second) {
-            docs.insert({it_before->second.first, { rawString.str() , commentLoc }});
+            docs.insert({it_before->second.first, { rawString.str() , it_before->first }});
         } else {
             attributes %= " data-doc=\"" % it_before->second.first % "\"";
         }
