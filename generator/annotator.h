@@ -86,8 +86,8 @@ private:
                       Annotator::DeclType dt, const std::string &typeRef, clang::Decl *decl);
     // ref -> [ what, loc, typeRef ]
     std::map<std::string, std::vector<std::tuple<DeclType, clang::SourceLocation, std::string>>> references;
-    std::map<std::string, ssize_t> structure_sizes;
-    std::map<std::string, ssize_t> field_offsets;
+    std::map<std::string, std::tuple<ssize_t, clang::SourceLocation>> structure_sizes;
+    std::map<std::string, std::tuple<ssize_t, clang::SourceLocation>> field_offsets;
     std::unordered_map<pathTo_cache_key_t, std::string> pathTo_cache;
     CommentHandler commentHandler;
 
