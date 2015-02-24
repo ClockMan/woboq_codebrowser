@@ -472,7 +472,6 @@ $(function () {
                     var comment = $(this).html();
                     if ($.inArray(comment, seen_comments) !== -1)
                         return;
-                    seen_comments.push(comment);
                     if (comment.length > 550) {
                         // FIXME: we should not split in an escape code
                         comment = comment.substr(0, 500) + "<a href='#' class='expandcomment'> [more...]</a><span style='display:none'>" + comment.substr(500) + "</span>";
@@ -485,6 +484,8 @@ $(function () {
                     }
                     var url = proj_root_path + "/" + f + ".html#" + l;
                     content += " <a href='" + url +"'>&#8618;</a>";
+
+                    seen_comments.push(comment);
                 });
 
                 var p = function (label, tag) {
