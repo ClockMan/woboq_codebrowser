@@ -476,13 +476,13 @@ $(function () {
                         // FIXME: we should not split in an escape code
                         comment = comment.substr(0, 500) + "<a href='#' class='expandcomment'> [more...]</a><span style='display:none'>" + comment.substr(500) + "</span>";
                     }
-                    content += "<br/><i>" + comment + "</i>";
                     var f = $(this).attr("f");
                     var l = $(this).attr("l");
                     if (f != file || currentLine != l) {
                         return;
                     }
                     var url = proj_root_path + "/" + f + ".html#" + l;
+                    content += "<br/><i>" + comment + "</i>";
                     content += " <a href='" + url +"'>&#8618;</a>";
 
                     seen_comments.push(comment);
