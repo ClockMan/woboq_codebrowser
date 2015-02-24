@@ -557,19 +557,15 @@ $(function () {
                         return;
                     }
                     var size = $(this).html();
-                    content += "<br/>Size: " + escape_html(size.text()) + " bytes";
+                    content += "<br/>Size: " + escape_html(size) + " bytes";
                 });
 
                 // Uses:
-                res.find("offset").each(function() {
-                    var f = $(this).attr("f");
-                    var l = $(this).attr("l");
-                    if (f != file || currentLine != l) {
-                        return;
-                    }
-                    var offset = $(this).html();
-                    content += "<br/><a href='#' class='showuse'>Show Uses:</a> (" + offset + ")<br/><span class='uses_placeholder'></span>";
-                });
+                var uses = res.find("use");
+                if (uses.length) {
+                    content += "<br/><a href='#' class='showuse'>Show Uses:</a> (" + uses.length + ")<br/><span class='uses_placeholder'></span>"
+                }
+
                 var useShown = false;
                 showUseFunc = function() {
                     if (useShown) {
@@ -629,10 +625,16 @@ $(function () {
                     uses = undefined; // free memory
                     return false;
                 }
-                var offset = res.find("offset");
-                if (offset.length === 1) {
-                    content += "<br/>Offset: " + escape_html(offset.text() >> 3) + " bytes (" + offset.text() + ")";
-                }
+
+                res.find("offset").each(function() {
+                    var f = $(this).attr("f");
+                    var l = $(this).attr("l");
+                    if (f != file || currentLine != l) {
+                        return;
+                    }
+                    var offset = $(this).html();
+                    content += "<br/>Offset: " + escape_html(offset >> 3) + " bytes (" + offset + ")";
+                });
             }
 
             tt.empty();
