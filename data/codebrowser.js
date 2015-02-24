@@ -464,6 +464,7 @@ $(function () {
                 var res = $("<data>"+data+"</data>");
 
                 var typePrefixLen = -1;
+                var currentLine = elem.parents("tr").find("th").text();
 
                 //comments:
                 var seen_comments = [];
@@ -471,18 +472,20 @@ $(function () {
                     var comment = $(this).html();
                     if ($.inArray(comment, seen_comments) !== -1)
                         return;
-                    seen_comments.push(comment);
                     if (comment.length > 550) {
                         // FIXME: we should not split in an escape code
                         comment = comment.substr(0, 500) + "<a href='#' class='expandcomment'> [more...]</a><span style='display:none'>" + comment.substr(500) + "</span>";
                     }
-                    content += "<br/><i>" + comment + "</i>";
                     var f = $(this).attr("f");
                     var l = $(this).attr("l");
-                    if (f && l) {
-                        var url = proj_root_path + "/" + f + ".html#" + l;
-                        content += " <a href='" + url +"'>&#8618;</a>";
+                    if (f != file || currentLine != l) {
+                        return;
                     }
+                    var url = proj_root_path + "/" + f + ".html#" + l;
+                    content += "<br/><i>" + comment + "</i>";
+                    content += " <a href='" + url +"'>&#8618;</a>";
+
+                    seen_comments.push(comment);
                 });
 
                 var p = function (label, tag) {
@@ -548,16 +551,22 @@ $(function () {
                 p(isType ? "Inherited by" : "Overriden by", "ovr");
 
                 // Size:
-                var size = res.find("size");
-                if (size.length === 1) {
-                    content += "<br/>Size: " + escape_html(size.text()) + " bytes";
-                }
+                res.find("size").each(function() {
+                    var f = $(this).attr("f");
+                    var l = $(this).attr("l");
+                    if (f != file || currentLine != l) {
+                        return;
+                    }
+                    var size = $(this).html();
+                    content += "<br/>Size: " + escape_html(size) + " bytes";
+                });
 
                 // Uses:
                 var uses = res.find("use");
                 if (uses.length) {
                     content += "<br/><a href='#' class='showuse'>Show Uses:</a> (" + uses.length + ")<br/><span class='uses_placeholder'></span>"
                 }
+
                 var useShown = false;
                 showUseFunc = function() {
                     if (useShown) {
@@ -617,10 +626,16 @@ $(function () {
                     uses = undefined; // free memory
                     return false;
                 }
-                var offset = res.find("offset");
-                if (offset.length === 1) {
-                    content += "<br/>Offset: " + escape_html(offset.text() >> 3) + " bytes (" + offset.text() + ")";
-                }
+
+                res.find("offset").each(function() {
+                    var f = $(this).attr("f");
+                    var l = $(this).attr("l");
+                    if (f != file || currentLine != l) {
+                        return;
+                    }
+                    var offset = $(this).html();
+                    content += "<br/>Offset: " + escape_html(parseInt(offset, 10) >> 3) + " bytes (" + offset + ")";
+                });
             }
 
             tt.empty();
