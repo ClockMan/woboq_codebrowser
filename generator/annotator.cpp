@@ -382,7 +382,7 @@ bool Annotator::generate(clang::Sema &Sema, bool WasInDatabase)
             ssize_t size = std::get<0>(itS->second);
             clang::SourceLocation loc = std::get<1>(itS->second);
             if (size != -1) {
-               myfile << "<size";
+               myfile << "<size ";
                addFilePathAndLoc(myfile, loc);
                myfile << ">"<< size <<"</size>\n";
             }
@@ -392,7 +392,7 @@ bool Annotator::generate(clang::Sema &Sema, bool WasInDatabase)
             ssize_t offset = std::get<0>(itF->second);
             clang::SourceLocation loc = std::get<1>(itF->second);
             if (offset != -1) {
-               myfile << "<offset";
+               myfile << "<offset ";
                addFilePathAndLoc(myfile, loc);
                myfile << ">"<< offset <<"</size>\n";
             }
