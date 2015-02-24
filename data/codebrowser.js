@@ -673,6 +673,7 @@ $(function () {
                 var def =  res.find("def");
                 if (def.length > 0) {
 
+                    var currentLine = elem.parents("tr").find("th").text();
                     //if there are several definition we take the one closer in the hierarchy.
                     var result = {  len: -2, brk: true };
                     def.each( function() {
