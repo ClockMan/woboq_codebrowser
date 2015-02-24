@@ -326,12 +326,6 @@ bool Annotator::generate(clang::Sema &Sema, bool WasInDatabase)
 #endif
         for (auto &it2 : it.second) {
             clang::SourceLocation loc = std::get<1>(it2);
-            clang::SourceManager &sm = getSourceMgr();
-            clang::SourceLocation exp = sm.getExpansionLoc(loc);
-            std::string fn = htmlNameForFile(sm.getFileID(exp));
-            if (fn.empty())
-                continue;
-            clang::PresumedLoc fixed = sm.getPresumedLoc(exp);
             const char *tag = "";
             char usetype = '\0';
             switch(std::get<0>(it2)) {
@@ -370,9 +364,7 @@ bool Annotator::generate(clang::Sema &Sema, bool WasInDatabase)
                 case Inherit:
                     tag = "inh";
             }
-            myfile << "<" << tag << " f='";
-            Generator::escapeAttr(myfile, fn);
-            myfile << "' l='"<<  fixed.getLine()  <<"'";
+            addFilePathAndLoc(myfile, loc);
             if (loc.isMacroID()) myfile << " macro='1'";
             if (!WasInDatabase) myfile << " brk='1'";
             if (usetype) myfile << " u='" << usetype << "'";
@@ -384,6 +376,7 @@ bool Annotator::generate(clang::Sema &Sema, bool WasInDatabase)
             }
             myfile <<"/>\n";
         }
+
         auto itS = structure_sizes.find(it.first);
         if (itS != structure_sizes.end() && itS->second != -1) {
             myfile << "<size>"<< itS->second <<"</size>\n";
@@ -394,13 +387,9 @@ bool Annotator::generate(clang::Sema &Sema, bool WasInDatabase)
         }
         auto range =  commentHandler.docs.equal_range(it.first);
         for (auto it2 = range.first; it2 != range.second; ++it2) {
-            clang::SourceManager &sm = getSourceMgr();
-            clang::SourceLocation exp = sm.getExpansionLoc(it2->second.loc);
-            clang::PresumedLoc fixed = sm.getPresumedLoc(exp);
-            std::string fn = htmlNameForFile(sm.getFileID(exp));
-            myfile << "<doc f='";
-            Generator::escapeAttr(myfile, fn);
-            myfile << "' l='" << fixed.getLine() << "'>";
+            myfile << "<doc ";
+            addFilePathAndLoc(myfile, it2->second.loc);
+            myfile << ">";
             Generator::escapeAttr(myfile, it2->second.content);
             myfile << "</doc>\n";
         }
@@ -1042,4 +1031,15 @@ void Annotator::syntaxHighlight(Generator &generator, clang::FileID FID, clang::
 
         L.LexFromRawLexer(Tok);
     }
+}
+
+void Annotator::addFilePathAndLoc(llvm::raw_fd_ostream &stream, const clang::SourceLocation &loc)
+{
+    clang::SourceManager &sm = getSourceMgr();
+    clang::SourceLocation exp = sm.getExpansionLoc(loc);
+    std::string fn = htmlNameForFile(sm.getFileID(exp));
+    clang::PresumedLoc fixed = sm.getPresumedLoc(exp);
+    stream << "f='";
+    Generator::escapeAttr(stream, fn);
+    stream << "' l='" << fixed.getLine() << "'";
 }

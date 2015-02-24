@@ -145,4 +145,6 @@ public:
      * (that is, if a tooltip file should be generated for it)
      */
     std::string getVisibleRef(clang::NamedDecl* Decl);
+
+    void addFilePathAndLoc(llvm::raw_fd_ostream &stream, const clang::SourceLocation &loc);
 };
