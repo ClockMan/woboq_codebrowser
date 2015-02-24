@@ -246,6 +246,7 @@ void CommentHandler::handleComment(Annotator &A, Generator& generator, clang::Se
     llvm::StringRef rawString(bufferStart+commentStart, len);
     std::string attributes;
     std::string DeclRef;
+    clang::NamedDecl *Decl = nullptr;
 
 
     if ((rawString.ltrim().startswith("/**") && !rawString.ltrim().startswith("/***"))
@@ -271,10 +272,11 @@ void CommentHandler::handleComment(Annotator &A, Generator& generator, clang::Se
         CommentVisitor visitor{A, generator, traits, Sema};
         visitor.visit(fullComment);
         DeclRef = visitor.DeclRef;
+        Decl = visitor.Decl;
     }
 
-    if (!DeclRef.empty()) {
-        docs.insert({std::move(DeclRef), { rawString.str() , commentLoc }});
+    if (Decl) {
+        docs.insert({std::move(DeclRef), { rawString.str() , Decl->getLocStart() }});
         generator.addTag("i", attributes, commentStart, len);
         return;
     }
