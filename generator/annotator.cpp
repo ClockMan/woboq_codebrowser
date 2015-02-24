@@ -364,6 +364,7 @@ bool Annotator::generate(clang::Sema &Sema, bool WasInDatabase)
                 case Inherit:
                     tag = "inh";
             }
+            myfile << "<" << tag << " ";
             addFilePathAndLoc(myfile, loc);
             if (loc.isMacroID()) myfile << " macro='1'";
             if (!WasInDatabase) myfile << " brk='1'";
