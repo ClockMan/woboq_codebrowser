@@ -464,6 +464,7 @@ $(function () {
                 var res = $("<data>"+data+"</data>");
 
                 var typePrefixLen = -1;
+                var currentLine = elem.parents("tr").find("th").text();
 
                 //comments:
                 var seen_comments = [];
@@ -480,6 +481,9 @@ $(function () {
                     var f = $(this).attr("f");
                     var l = $(this).attr("l");
                     if (f && l) {
+                        if (f != file || currentLine != l) {
+                            return;
+                        }
                         var url = proj_root_path + "/" + f + ".html#" + l;
                         content += " <a href='" + url +"'>&#8618;</a>";
                     }
@@ -548,16 +552,26 @@ $(function () {
                 p(isType ? "Inherited by" : "Overriden by", "ovr");
 
                 // Size:
-                var size = res.find("size");
-                if (size.length === 1) {
+                res.find("size").each(function() {
+                    var f = $(this).attr("f");
+                    var l = $(this).attr("l");
+                    if (f != file || currentLine != l) {
+                        return;
+                    }
+                    var size = $(this).html();
                     content += "<br/>Size: " + escape_html(size.text()) + " bytes";
-                }
+                });
 
                 // Uses:
-                var uses = res.find("use");
-                if (uses.length) {
-                    content += "<br/><a href='#' class='showuse'>Show Uses:</a> (" + uses.length + ")<br/><span class='uses_placeholder'></span>"
-                }
+                res.find("offset").each(function() {
+                    var f = $(this).attr("f");
+                    var l = $(this).attr("l");
+                    if (f != file || currentLine != l) {
+                        return;
+                    }
+                    var offset = $(this).html();
+                    content += "<br/><a href='#' class='showuse'>Show Uses:</a> (" + offset + ")<br/><span class='uses_placeholder'></span>";
+                });
                 var useShown = false;
                 showUseFunc = function() {
                     if (useShown) {
@@ -659,7 +673,6 @@ $(function () {
                 var def =  res.find("def");
                 if (def.length > 0) {
 
-                    var currentLine = elem.parents("tr").find("th").text();
                     //if there are several definition we take the one closer in the hierarchy.
                     var result = {  len: -2, brk: true };
                     def.each( function() {
