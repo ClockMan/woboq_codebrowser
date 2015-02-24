@@ -480,13 +480,11 @@ $(function () {
                     content += "<br/><i>" + comment + "</i>";
                     var f = $(this).attr("f");
                     var l = $(this).attr("l");
-                    if (f && l) {
-                        if (f != file || currentLine != l) {
-                            return;
-                        }
-                        var url = proj_root_path + "/" + f + ".html#" + l;
-                        content += " <a href='" + url +"'>&#8618;</a>";
+                    if (f != file || currentLine != l) {
+                        return;
                     }
+                    var url = proj_root_path + "/" + f + ".html#" + l;
+                    content += " <a href='" + url +"'>&#8618;</a>";
                 });
 
                 var p = function (label, tag) {
